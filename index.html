@@ -8,8 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Chosen Palette: Warm Harmony -->
-    <!-- Application Structure Plan: 이 SPA는 사용자가 여행 일정을 직관적으로 탐색하고 개인화할 수 있도록 설계되었습니다. 핵심 구조는 '탭(Tab)' 기반의 일일 스케줄러이며, 각 카드에는 일정, 식사, 그리고 구체적인 '추천 맛집' 정보가 포함되어 있습니다. 가장 중요한 상호작용 기능인 '교토 여행일 선택' 버튼은 JavaScript를 사용하여 2일차와 3일차의 모든 콘텐츠(일정, 식사, 맛집, 차트)를 동적으로 교체합니다. 새로운 Gemini LLM 기능으로, 각 날짜별로 '유용한 일본어 회화 (Text/TTS)'를 생성하는 기능과 전체 여행 '안전 팁 (Text)' 생성 기능이 추가되어 사용자 편의성을 높입니다. -->
-    <!-- Visualization & Content Choices: 1. 여행 일정 및 맛집: 목표(Goal)-정리 및 정보 제공, 표현 방식-아이콘 및 구체적인 식당 이름이 포함된 탭 기반 카드 UI, 상호작용-탭 클릭으로 날짜 전환 및 식당 정보 탐색. / 2. 여행 강도: 목표-정보 제공, 표현 방식-일일 활동량을 나타내는 바 차트(Chart.js), 상호작용-피로도를 시각적으로 빠르게 파악. / 3. 교토 여행일 선택: 목표-비교 및 재구성, 표현 방식-버튼 기반 UI, 상호작용-버튼 클릭 시 JavaScript를 통해 두 날짜의 전체 콘텐츠를 동적으로 교체하며, 차트 ID도 재할당하여 재렌더링. 4. Gemini LLM 통합: 목표-현지 적응 및 안전, 표현 방식-버튼 및 텍스트 출력, 상호작용-버튼 클릭으로 LLM 호출하여 상황별 회화 생성 및 TTS 재생, 전체 안전 팁 생성. 이 모든 선택은 SVG나 Mermaid.js 없이, 순수 HTML/Tailwind와 Canvas 기반 Chart.js를 사용하여 구현되었습니다. -->
+    <!-- Application Structure Plan: 이 SPA는 사용자가 여행 일정을 직관적으로 탐색하고 개인화할 수 있도록 설계되었습니다. 핵심 구조는 '탭(Tab)' 기반의 일일 스케줄러이며, 각 카드에는 일정, 식사, 구체적인 '추천 맛집' 정보, '영구 구글 맵 링크', 그리고 '이동 방법/교통수단'이 명확하게 포함되었습니다. '교토 여행일 선택' 버튼은 2일차와 3일차의 모든 콘텐츠를 동적으로 교체합니다. Gemini LLM 기능으로, 각 날짜별 '유용한 일본어 회화 (Text/TTS)' 생성 기능과 전체 여행 '안전 팁 (Text)' 생성 기능이 통합되어 사용자 편의성을 극대화합니다. -->
+    <!-- Visualization & Content Choices: 1. 여행 일정 및 맛집: 목표(Goal)-정리 및 정보 제공 및 현지 접근성 향상, 표현 방식-아이콘, 구체적인 식당 이름, 그리고 '영구 구글 맵 링크 버튼', '교통수단 및 이동 방법'이 포함된 탭 기반 카드 UI, 상호작용-탭 클릭 및 맵 링크 클릭으로 정보 탐색. / 2. 여행 강도: 목표-정보 제공, 표현 방식-일일 활동량을 나타내는 바 차트(Chart.js). / 3. 교토 여행일 선택: 목표-비교 및 재구성, 표현 방식-버튼 기반 UI, 상호작용-버튼 클릭 시 JavaScript를 통해 두 날짜의 전체 콘텐츠를 동적으로 교체. 4. Gemini LLM 통합: 목표-현지 적응 및 안전, 표현 방식-버튼 및 텍스트 출력, 상호작용-버튼 클릭으로 LLM 호출하여 상황별 회화 생성 및 TTS 재생, 전체 안전 팁 생성. 5. 노선도: 오사카 지하철 노선 지도를 이미지로 제공하여 교통 파악에 도움을 줍니다. 이 모든 선택은 SVG나 Mermaid.js 없이, 순수 HTML/Tailwind와 Canvas 기반 Chart.js를 사용하여 구현되었습니다. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
@@ -62,7 +62,7 @@
             margin-top: 8px;
         }
         .gemini-btn {
-            background-color: #5E548E; 
+            background-color: #5E548E;
             color: white;
             padding: 0.75rem 1.25rem;
             border-radius: 0.5rem;
@@ -81,13 +81,35 @@
             border-radius: 0.5rem;
             padding: 0.5rem;
         }
+        .map-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            margin-top: 8px;
+            font-size: 0.8rem;
+            background-color: #E07A5F;
+            color: white;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .map-link:hover {
+            background-color: #c7674e;
+        }
+        .transport-info {
+            font-size: 0.85rem;
+            color: #5E548E;
+            font-weight: 600;
+            margin-top: 5px;
+            padding: 4px 0;
+            border-top: 1px dashed #E07A5F30;
+        }
     </style>
 </head>
 <body>
     <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
         <header class="text-center mb-8">
             <h1 class="text-4xl md:text-5xl font-bold text-[#3D405B]">오사카 3박 4일 가족 여행</h1>
-            <p class="text-lg text-gray-600 mt-2">여행과 맛집, 그리고 실시간 도우미까지! 완전한 플래너입니다.</p>
+            <p class="text-lg text-gray-600 mt-2">여행과 맛집, 그리고 실시간 도우미까지! 완벽한 이동 정보가 추가된 플래너입니다.</p>
         </header>
 
         <main>
@@ -118,13 +140,20 @@
                                         </div>
                                         <div class="plan-card p-4 rounded-lg shadow-md">
                                             <p class="font-bold text-lg"><i class="far fa-clock mr-2"></i>오후 4:00</p>
-                                            <p>간사이 국제공항 도착 후 난바역 숙소로 이동</p>
+                                            <p>간사이 국제공항 도착 후 **ESLEAD HOTEL Namba Ebisu West**로 이동</p>
+                                            <p class="transport-info"><i class="fas fa-train mr-1"></i> 교통수단: 난카이 공항선 급행 또는 라피트 (별도 구매)</p>
+                                            <p class="transport-info">이동 방법: 간사이 공항에서 난바역까지 이동 후 호텔까지 도보/택시.</p>
+                                            <a href="https://www.google.com/maps/search/ESLEAD+HOTEL+Namba+Ebisu+West" target="_blank" class="map-link"><i class="fas fa-map-marker-alt mr-1"></i> ESLEAD HOTEL Namba Ebisu West 맵</a>
                                         </div>
                                         <div class="plan-card p-4 rounded-lg shadow-md">
                                             <p class="font-bold text-lg"><i class="far fa-clock mr-2"></i>오후 7:00</p>
                                             <p>도톤보리 저녁 식사 및 탐방</p>
+                                            <p class="transport-info"><i class="fas fa-walking mr-1"></i> 교통수단: 도보</p>
+                                            <p class="transport-info">이동 방법: 호텔에서 도톤보리까지 도보 10-15분.</p>
                                             <p class="text-sm text-gray-600 mt-1">팁: 글리코상 간판 앞에서 가족사진은 필수! 유명한 타코야끼나 오코노미야끼 줄이 길 수 있습니다.</p>
-                                            <span class="food-reco"><i class="fas fa-utensils mr-1"></i> 추천 저녁: **오코노미야끼 미즈노** 또는 **이치란 라멘 도톤보리 본점**. (구글맵 검색 추천)</span>
+                                            <span class="food-reco"><i class="fas fa-utensils mr-1"></i> 추천 저녁: **오코노미야끼 미즈노** 또는 **이치란 라멘 도톤보리 본점**.</span>
+                                            <a href="https://www.google.com/maps/search/%EC%98%A4%EC%BD%94%EB%85%B8%EB%AF%B8%EC%95%BC%EB%81%BC+%EB%AF%B8%EC%A6%88%EB%85%B8" target="_blank" class="map-link"><i class="fas fa-map-marker-alt mr-1"></i> 미즈노 맵</a>
+                                            <a href="https://www.google.com/maps/search/%EC%9D%B4%EC%B9%98%EB%9E%80+%EB%9D%BC%EB%A9%98+%EB%8F%84%ED%86%A4%EB%B3%B4%EB%A6%AC+%EB%B3%B8%EC%A0%90" target="_blank" class="map-link ml-2"><i class="fas fa-map-marker-alt mr-1"></i> 이치란 맵</a>
                                         </div>
                                     </div>
                                     <!-- Gemini Integration for Day 1 -->
@@ -165,8 +194,11 @@
                                         <div class="plan-card p-4 rounded-lg shadow-md">
                                             <p class="font-bold text-lg"><i class="far fa-clock mr-2"></i>오전 9:00</p>
                                             <p>구로몬 시장 아침 식사 및 구경</p>
+                                            <p class="transport-info"><i class="fas fa-walking mr-1"></i> 교통수단: 도보</p>
+                                            <p class="transport-info">이동 방법: 호텔에서 구로몬 시장까지 도보 5~10분.</p>
                                              <p class="text-sm text-gray-600 mt-1">팁: 오사카의 부엌. 신선한 해산물을 맛보거나 아침 식사를 해결하기 좋습니다.</p>
                                              <span class="food-reco"><i class="fas fa-utensils mr-1"></i> 추천 아침: **구로몬 시장** 내 신선한 **스시/참치 덮밥** 또는 **어묵**.</span>
+                                              <a href="https://www.google.com/maps/search/%EA%B5%AC%EB%A1%9C%EB%AA%AC+%EC%8B%9C%EC%9E%A5" target="_blank" class="map-link"><i class="fas fa-map-marker-alt mr-1"></i> 구로몬 시장 맵</a>
                                         </div>
                                         <div class="plan-card p-4 rounded-lg shadow-md">
                                             <p class="font-bold text-lg"><i class="far fa-clock mr-2"></i>오전 11:00</p>
@@ -175,7 +207,10 @@
                                         <div class="plan-card p-4 rounded-lg shadow-md">
                                             <p class="font-bold text-lg"><i class="far fa-clock mr-2"></i>오후 12:30</p>
                                             <p>난바역 또는 공항에서 점심 식사 후 간사이 공항으로 이동</p>
+                                            <p class="transport-info"><i class="fas fa-train mr-1"></i> 교통수단: 난카이 공항선 급행 또는 라피트</p>
+                                            <p class="transport-info">이동 방법: 난바역(호텔 근처)에서 KIX행 난카이선 탑승.</p>
                                             <span class="food-reco"><i class="fas fa-utensils mr-1"></i> 추천 점심: **간사이 공항** 내 식당가 (간단식) 또는 **난바역** 주변 **규카츠**.</span>
+                                            <a href="https://www.google.com/maps/search/%EB%82%9C%EB%B0%94%EC%97%AD" target="_blank" class="map-link"><i class="fas fa-map-marker-alt mr-1"></i> 난바역 맵</a>
                                         </div>
                                         <div class="plan-card p-4 rounded-lg shadow-md">
                                             <p class="font-bold text-lg"><i class="far fa-clock mr-2"></i>오후 4:00</p>
@@ -221,6 +256,16 @@
                     </div>
                  </div>
             </section>
+            
+            <!-- Transportation Map Section -->
+            <section id="transportation" class="mb-12">
+                <h2 class="text-2xl md:text-3xl mb-6 text-center section-title w-fit mx-auto">오사카 시내 교통 노선 지도</h2>
+                <div class="bg-white p-6 rounded-2xl shadow-lg text-center">
+                    <p class="text-gray-600 mb-4">난바역(Namba) 근처에 숙소가 있으므로, 미도스지선(빨간색)을 중심으로 이동 계획을 세우면 편리합니다.</p>
+                    <a href="https://upload.wikimedia.org/wikipedia/commons/e/e9/Osaka_Subway_Route_Map_%282024%29_Korean.svg" target="_blank" class="map-link mx-auto mb-4" style="display: block; width: fit-content;"><i class="fas fa-subway mr-1"></i> 오사카 지하철 노선도 크게 보기</a>
+                    
+                </div>
+            </section>
 
             <!-- Interactive Control Section -->
             <section id="interactive-control" class="mb-12 text-center bg-white p-6 rounded-2xl shadow-lg">
@@ -243,6 +288,7 @@
                         <ul class="list-disc list-inside space-y-2 text-gray-700">
                             <li><strong>유니버설 스튜디오 재팬 (USJ):</strong> 하루 전체를 투자해야 하는 곳. 가족 모두에게 최고의 만족도를 줄 수 있습니다.</li>
                             <li><strong>오사카 수족관 (가이유칸):</strong> 세계적인 규모의 수족관. 덴포잔 대관람차와 묶어 일정을 짜면 좋습니다.</li>
+                            <a href="https://www.google.com/maps/search/%EC%9C%A0%EB%8B%88%EB%B2%84%EC%84%AC+%EC%8A%A4%ED%8A%9C%EB%94%94%EC%98%A4+%EC%9E%AC%ED%8C%AC" target="_blank" class="map-link"><i class="fas fa-map-marker-alt mr-1"></i> USJ/가이유칸 맵</a>
                             <li><strong>오사카 성:</strong> 역사에 관심 있는 가족에게 추천.</li>
                         </ul>
                     </div>
@@ -251,7 +297,9 @@
                         <h3 class="text-xl font-bold mb-3 text-[#3D405B]"><i class="fas fa-lightbulb mr-2 text-blue-500"></i>Gemini 추천 코스</h3>
                         <ul class="list-disc list-inside space-y-2 text-gray-700">
                             <li><strong>컵누들 박물관 (이케다):</strong> 나만의 컵라면 만들기 체험. 아이들이 있다면 적극 추천합니다.</li>
+                            <a href="https://www.google.com/maps/search/%EC%BB%B5%EB%88%84%EB%93%A4+%EB%B0%95%EB%AC%BC%EA%B4%80+%EC%9D%B4%EC%BC%80%EB%8B%A4" target="_blank" class="map-link"><i class="fas fa-map-marker-alt mr-1"></i> 컵누들 박물관 맵</a>
                             <li><strong>나카자키쵸 카페 거리:</strong> 고즈넉하고 개성 있는 카페들이 많아 휴식이나 사진 찍기에 좋습니다.</li>
+                            <a href="https://www.google.com/maps/search/%EB%82%98%EC%B9%B4%EC%9E%90%ED%82%A4%EC%B5%B8+%EC%B9%B4%ED%8E%98+%EA%B1%B0%EB%A6%AC" target="_blank" class="map-link"><i class="fas fa-map-marker-alt mr-1"></i> 나카자키쵸 맵</a>
                         </ul>
                     </div>
                     <!-- Kobe Option -->
@@ -260,6 +308,7 @@
                          <ul class="list-disc list-inside space-y-2 text-gray-700">
                             <li><strong>고베 하버랜드:</strong> 세련된 야경과 쇼핑, 식사를 즐길 수 있는 항구.</li>
                             <li><strong>기타노이진칸:</strong> 유럽풍의 이국적인 거리.</li>
+                            <a href="https://www.google.com/maps/search/%EA%B3%A0%EB%B2%A0+%ED%95%98%EB%B2%84%EB%9E%9C%EB%93%9C" target="_blank" class="map-link"><i class="fas fa-map-marker-alt mr-1"></i> 고베 하버랜드 맵</a>
                             <li><strong>고베규:</strong> 예산이 허락한다면, 고베에서 세계적인 소고기 요리를 경험해 보세요.</li>
                         </ul>
                     </div>
@@ -268,7 +317,7 @@
         </main>
 
         <footer class="text-center mt-12 py-6 border-t border-gray-300">
-            <p class="text-gray-500">맛집 정보는 현지 상황에 따라 변동될 수 있으므로, 출발 전 구글 지도에서 다시 한 번 확인해 주세요.</p>
+            <p class="text-gray-500">맛집 정보 및 지도 링크는 현지 상황에 따라 변동될 수 있습니다. 출발 전 확인 필수!</p>
         </footer>
     </div>
 
@@ -286,21 +335,33 @@
                     <div class="plan-card p-4 rounded-lg shadow-md">
                         <p class="font-bold text-lg"><i class="far fa-clock mr-2"></i>오전 9:30</p>
                         <p>오사카 성 공원 산책 및 천수각 관람</p>
+                        <p class="transport-info"><i class="fas fa-subway mr-1"></i> 교통수단: 오사카 지하철 (주유 패스 사용 권장)</p>
+                        <p class="transport-info">이동 방법: 난바역에서 미도스지선(빨간선) 탑승 후 혼마치역 환승 또는 JR 이용. 모리노미야역/오사카죠코엔역 하차.</p>
+                         <a href="https://www.google.com/maps/search/%EC%98%A4%EC%82%AC%EC%B9%B4+%EC%84%B1" target="_blank" class="map-link"><i class="fas fa-map-marker-alt mr-1"></i> 오사카 성 맵</a>
                     </div>
                     <div class="plan-card p-4 rounded-lg shadow-md">
                         <p class="font-bold text-lg"><i class="far fa-clock mr-2"></i>오후 1:00</p>
                         <p>신세카이 지역으로 이동하여 점심 식사</p>
-                        <p class="text-sm text-gray-600 mt-1">팁: 츠텐카쿠 타워 근처 복고풍 거리에서 쿠시카츠를 맛보세요.</p>
+                        <p class="transport-info"><i class="fas fa-subway mr-1"></i> 교통수단: 오사카 지하철 (주유 패스 사용 권장)</p>
+                        <p class="transport-info">이동 방법: 오사카 성 근처에서 사카이스지선 이용 후 에비스초역 하차. (츠텐카쿠 타워 근처)</p>
+                        <p class="text-sm text-gray-600 mt-1">팁: 츠텐카쿠 타워 근처 복고풍 거리에서 쿠시카츠를 맛보세요. (주유패스 무료 입장)</p>
                         <span class="food-reco"><i class="fas fa-hotdog mr-1"></i> 추천 점심: **쿠시카츠 다루마 신세카이 본점**. (튀김 꼬치)</span>
+                        <a href="https://www.google.com/maps/search/%EC%BF%A0%EC%8B%9C%EC%B9%B4%EC%B8%A0+%EB%8B%A4%EB%A3%A8%EB%A7%88+%EC%8B%A0%EC%84%B8%EC%B9%B4%EC%9D%B4+%EB%B3%B8%EC%A0%90" target="_blank" class="map-link"><i class="fas fa-map-marker-alt mr-1"></i> 다루마 맵</a>
                     </div>
                     <div class="plan-card p-4 rounded-lg shadow-md">
                         <p class="font-bold text-lg"><i class="far fa-clock mr-2"></i>오후 3:30</p>
-                        <p>우메다 스카이 빌딩 공중정원에서 도시 전경 감상</p>
+                        <p>우메다 스카이 빌딩 공중정원에서 도시 전경 감상 (주유패스 무료 입장)</p>
+                        <p class="transport-info"><i class="fas fa-subway mr-1"></i> 교통수단: 오사카 지하철 (주유 패스 사용 권장)</p>
+                        <p class="transport-info">이동 방법: 미도스지선(빨간선) 도부츠엔마에역/난바역에서 우메다역으로 이동 후 도보 10분.</p>
+                        <a href="https://www.google.com/maps/search/%EC%9A%B0%EB%A9%94%EB%8B%A4+%EC%8A%A4%EC%B9%B4%EC%9D%B4+%EB%B9%8C%EB%94%A9+%EA%B3%B5%EC%A4%91%EC%A0%95%EC%9B%90" target="_blank" class="map-link"><i class="fas fa-map-marker-alt mr-1"></i> 우메다 스카이 맵</a>
                     </div>
                     <div class="plan-card p-4 rounded-lg shadow-md">
                         <p class="font-bold text-lg"><i class="far fa-clock mr-2"></i>오후 7:00</p>
                         <p>우메다 또는 난바로 돌아와 저녁 식사 및 쇼핑</p>
+                        <p class="transport-info"><i class="fas fa-subway mr-1"></i> 교통수단: 오사카 지하철 미도스지선</p>
+                        <p class="transport-info">이동 방법: 우메다역에서 난바역까지 미도스지선으로 이동.</p>
                         <span class="food-reco"><i class="fas fa-drumstick-bite mr-1"></i> 추천 저녁: **야키니쿠 M (난바)** 또는 **백화점 식당가**. (가족이 편안하게 식사하기 좋습니다)</span>
+                        <a href="https://www.google.com/maps/search/%EC%95%BC%ED%82%A4%EB%8B%88%EC%BF%A0+M+%EB%82%9C%EB%B0%94" target="_blank" class="map-link"><i class="fas fa-map-marker-alt mr-1"></i> 야키니쿠 M 맵</a>
                     </div>
                 </div>
                 <!-- Gemini Integration for Osaka Day -->
@@ -334,27 +395,41 @@
                      <div class="plan-card p-4 rounded-lg shadow-md">
                         <p class="font-bold text-lg"><i class="far fa-clock mr-2"></i>오전 8:30</p>
                         <p>난바에서 교토로 이동 (이동 중 간단한 아침 식사)</p>
+                        <p class="transport-info"><i class="fas fa-train mr-1"></i> 교통수단: 사철 (케이한선 추천)</p>
+                        <p class="transport-info">이동 방법: 난바역(지하철)에서 기타하마역 또는 요도야바시역으로 이동 후 케이한선 환승 (특급 이용).</p>
                         <span class="food-reco"><i class="fas fa-train mr-1"></i> 추천 아침: 난바역 **JR/사철 역사 내** 베이커리 또는 편의점.</span>
                     </div>
                     <div class="plan-card p-4 rounded-lg shadow-md">
                         <p class="font-bold text-lg"><i class="far fa-clock mr-2"></i>오전 10:00</p>
                         <p>후시미 이나리 신사 (붉은 토리이 길) 방문</p>
+                        <p class="transport-info"><i class="fas fa-walking mr-1"></i> 교통수단: 케이한선</p>
+                        <p class="transport-info">이동 방법: 케이한선 후시미이나리역 하차 후 도보 5분.</p>
                         <p class="text-sm text-gray-600 mt-1">팁: 계단이 많으므로 편한 복장과 신발이 필수입니다.</p>
+                        <a href="https://www.google.com/maps/search/%ED%9B%84%EC%8B%9C%EB%AF%B8+%EC%9D%B4%EB%82%98%EB%A6%AC+%EC%8B%A0%EC%82%AC" target="_blank" class="map-link"><i class="fas fa-map-marker-alt mr-1"></i> 후시미 이나리 맵</a>
                     </div>
                     <div class="plan-card p-4 rounded-lg shadow-md">
                         <p class="font-bold text-lg"><i class="far fa-clock mr-2"></i>오후 1:00</p>
                         <p>기온 거리 또는 청수사 주변에서 점심 식사</p>
+                        <p class="transport-info"><i class="fas fa-bus mr-1"></i> 교통수단: 교토 시내버스 또는 도보</p>
+                        <p class="transport-info">이동 방법: 교토 시내버스는 복잡하니 케이한선 기요미즈고조역 하차 후 도보 15분 추천.</p>
                          <p class="text-sm text-gray-600 mt-1">팁: 교토 특유의 분위기를 즐길 수 있는 전통 요리를 시도해 보세요.</p>
                          <span class="food-reco"><i class="fas fa-leaf mr-1"></i> 추천 점심: **오멘 고다이지점** (교토식 우동) 또는 **유도후** (두부 요리 전문점).</span>
+                         <a href="https://www.google.com/maps/search/%EC%98%A4%EB%A9%98+%EA%B3%A0%EB%8B%A4%EC%9D%B4%EC%A7%80%EC%A0%90" target="_blank" class="map-link"><i class="fas fa-map-marker-alt mr-1"></i> 오멘 맵</a>
                     </div>
                     <div class="plan-card p-4 rounded-lg shadow-md">
                         <p class="font-bold text-lg"><i class="far fa-clock mr-2"></i>오후 3:30</p>
                         <p>기요미즈데라 (청수사) 관람 및 산넨자카/니넨자카 거리 탐방</p>
+                        <p class="transport-info"><i class="fas fa-walking mr-1"></i> 교통수단: 도보</p>
+                        <p class="transport-info">이동 방법: 주변 명소는 모두 도보로 이동.</p>
+                        <a href="https://www.google.com/maps/search/%EA%B8%B0%EC%9A%94%EB%AF%B8%EC%A6%88%EB%8D%B0%EB%9D%BC" target="_blank" class="map-link"><i class="fas fa-map-marker-alt mr-1"></i> 청수사 맵</a>
                     </div>
                     <div class="plan-card p-4 rounded-lg shadow-md">
                         <p class="font-bold text-lg"><i class="far fa-clock mr-2"></i>오후 6:00</p>
                         <p>교토역 또는 오사카 난바 복귀 후 저녁 식사</p>
+                        <p class="transport-info"><i class="fas fa-train mr-1"></i> 교통수단: 사철 (케이한선/JR)</p>
+                        <p class="transport-info">이동 방법: 케이한선 기요미즈고조역 등에서 난바/도톤보리 방면 복귀.</p>
                         <span class="food-reco"><i class="fas fa-fish mr-1"></i> 추천 저녁: **무사시 스시 (회전 초밥)** 또는 **긴자 바이린 (돈까스)**.</span>
+                        <a href="https://www.google.com/maps/search/%EB%AC%B4%EC%82%AC%EC%8B%9C+%EC%8A%A4%EC%8B%9C+%ED%9A%8C%EC%A0%84+%EC%B4%88%EB%B0%A5" target="_blank" class="map-link"><i class="fas fa-map-marker-alt mr-1"></i> 무사시 스시 맵</a>
                     </div>
                 </div>
                 <!-- Gemini Integration for Kyoto Day -->
@@ -640,7 +715,7 @@
                 throw new Error("오디오 데이터 생성 실패.");
             }
 
-            async function handlePhraseGeneration(dayId, location, context) {
+            window.handlePhraseGeneration = async function(dayId, location, context) {
                 const resultDiv = document.getElementById(`phraseResult-${dayId}`);
                 const audioContainer = document.getElementById(`audioContainer-${dayId}`);
                 const audioEl = audioContainer.querySelector('audio');
@@ -652,17 +727,14 @@
                 button.disabled = true;
 
                 try {
-                    // 1. Generate text phrases
                     const systemPrompt = "당신은 일본 여행자를 위한 친절한 회화 가이드입니다. 요청된 상황에 맞는 일본어 회화 3가지를 '한국어: 일본어 문장 (발음)' 형식으로만 제공해 주세요. 다른 설명은 절대 추가하지 마세요.";
                     const prompt = `지역: ${location}, 상황: ${context}`;
                     const textResult = await fetchText(prompt, systemPrompt);
                     
                     resultDiv.innerHTML = textResult.replace(/\n/g, '<br>');
 
-                    // 2. Prepare text for TTS (removing pronunciations for cleaner audio)
                     const ttsText = textResult.replace(/\([^)]+\)/g, '').replace(/(\r\n|\n|\r)/gm, ' '); 
                     
-                    // 3. Generate audio
                     const audioUrl = await fetchAudio(ttsText);
                     
                     audioEl.src = audioUrl;
@@ -670,14 +742,14 @@
 
                 } catch (error) {
                     console.error("Error generating phrase or audio:", error);
-                    resultDiv.innerHTML = `<p class="text-red-600">회화 생성에 실패했습니다. (${error.message || '네트워크 오류'})</p>`;
+                    resultDiv.innerHTML = `<p class="text-red-600">회화 생성에 실패했습니다. (API 키가 없거나 네트워크 오류)</p>`;
                     audioContainer.classList.add('hidden');
                 } finally {
                     button.disabled = false;
                 }
             }
 
-            async function generateSafetyTips() {
+            window.generateSafetyTips = async function() {
                 const tipsContainer = document.getElementById('tipsResult');
                 const tipsContent = document.getElementById('tipsContent');
                 const generateBtn = document.getElementById('generateTipsBtn');
@@ -692,17 +764,15 @@
                     
                     const textResult = await fetchText(prompt, systemPrompt);
                     
-                    // Simple Markdown conversion to HTML structure
                     let htmlContent = textResult
                         .split('\n')
                         .map(line => {
                             if (line.startsWith('##')) return `<h4 class="font-semibold text-lg mt-4 mb-2 text-[#5E548E]">${line.substring(2).trim()}</h4><ul class="list-disc pl-5 space-y-2">`;
                             if (line.startsWith('*') || line.startsWith('-')) return `<li>${line.substring(1).trim()}</li>`;
-                            return line.trim(); // Assume other lines are wrapped by previous LLM processing
+                            return line.trim();
                         })
                         .join('\n');
                     
-                    // Cleanup and close list if necessary
                     htmlContent = htmlContent.replace(/<\/ul>\n*<h4/g, '</ul><h4');
                     if (htmlContent.includes('<ul') && !htmlContent.endsWith('</ul>')) {
                         htmlContent += '</ul>';
@@ -712,15 +782,12 @@
                     
                 } catch (error) {
                     console.error("Error generating safety tips:", error);
-                    tipsContent.innerHTML = `<p class="text-red-600">안전 팁 생성에 실패했습니다. (${error.message || '네트워크 오류'})</p>`;
+                    tipsContent.innerHTML = `<p class="text-red-600">안전 팁 생성에 실패했습니다. (API 키가 없거나 네트워크 오류)</p>`;
                 } finally {
                     generateBtn.disabled = false;
                 }
             }
             
-            // Event listener for the Safety Tips button
-            generateTipsBtn.addEventListener('click', generateSafetyTips);
-
             // Initial setup (Kyoto on Day 2 by default)
             updateSchedule(true);
         });
